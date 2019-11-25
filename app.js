@@ -40,29 +40,23 @@ router.route('/Peliculas')
         FROM PELICULAS`, []);
             let conteo = (cantidad.rows[0].PELICULAS_DISPONIBLES) + 1;
             let newID;
-            if (conteo == 10 || conteo == 100 || conteo == 1000 || conteo == 10000) {
-                conteo = conteo + 1;
-            }
             if (conteo < 10) {
-                newID = `${conteo}0000`;
+                newID = `P000${conteo}`;
             }
             if (conteo > 10 && conteo < 100) {
-                newID = `${conteo}000`;
+                newID = `P00${conteo}`;
             }
             if (conteo > 100 && conteo < 1000) {
-                newID = `${conteo}00`;
+                newID = `P0${conteo}`;
             }
             if (conteo > 1000 && conteo < 10000) {
-                newID = `${conteo}0`;
-            }
-            if (conteo > 10000 && conteo < 99999) {
-                newID = `${conteo}`;
+                newID = `P${conteo}`;
             }
 
             //Validacion para el ID del director
             let director = req.body.ID_DIRECTOR;
             let exist = false;
-            if (director && director.length == 5) {
+            if (director && director.length == 5 && director[0] == "D") {
                 const directores = await database.simpleExecute(connectionName, `SELECT ID_DIRECTOR
             FROM DIRECTOR`, []);
                 (directores.rows).forEach(element => {
@@ -77,7 +71,7 @@ router.route('/Peliculas')
                     console.log(nuevo);
                 }
             } else {
-                director = "00001";
+                director = "D0001";
             }
 
             //Validacion para subir un docsito
@@ -107,7 +101,7 @@ router.route('/Peliculas')
                 DBMS_OUTPUT.put_line('DOC PLUGIN EXCEPTION caught');
         END;
         /
-        CALL Insertar_DocsBD(${newID},'${guiones}');
+        BEGIN Insertar_DocsBD('${newID}','${guiones}'); END;
         `;
             
             let doc = undefined;
@@ -128,13 +122,15 @@ router.route('/Peliculas')
             }
 
             const insertSql =
-                `INSERT INTO PELICULAS (ID_PELICULA, TITULO, ID_DIRECTOR, DESCRIPCION, DURACION, CREDITOS, GUIONES) VALUES (${artist.ID_PELICULA}, '${artist.TITULO}', '${artist.ID_DIRECTOR}', '${artist.DESCRIPCION}', ${artist.DURACION}, ${artist.CREDITOS}, ${artist.GUIONES})`;
+                `INSERT INTO PELICULAS (ID_PELICULA, TITULO, ID_DIRECTOR, DESCRIPCION, DURACION, CREDITOS, GUIONES) 
+                VALUES ('${artist.ID_PELICULA}', '${artist.TITULO}', '${artist.ID_DIRECTOR}', '${artist.DESCRIPCION}', 
+                ${artist.DURACION}, ${artist.CREDITOS}, ${artist.GUIONES})`;
             const result = await database.simpleExecute(connectionName, insertSql, []);
             console.log(result);
 
-            if (doc) {
+            if (doc) { //Si hay un documento
                 const createProcedure = await database.simpleExecute(connectionName, procedure, []);
-                console.log(procedure);
+                console.log(createProcedure);
             }
 
             res.sendStatus(200);
