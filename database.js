@@ -1,9 +1,7 @@
 const oracledb = require('oracledb');
 const connections = require('./connections');
 const connectionKeys = Object.keys(connections);
-//oracledb.fetchAsString = [oracledb.CLOB];
 
-// force all CLOBs to be returned as Strings
 oracledb.fetchAsString = [ oracledb.CLOB ];
 
 async function openConnections() {
@@ -28,8 +26,6 @@ async function openConnections() {
 
 module.exports.openConnections = openConnections;
 
-// simpleExecute will get a connection, execute a statement, and then close the
-// connection in a single call.
 function simpleExecute(poolAlias, statement, binds = [], opts = {}) {
     return new Promise(async (resolve, reject) => {
       let conn;
@@ -48,7 +44,7 @@ function simpleExecute(poolAlias, statement, binds = [], opts = {}) {
       } catch (err) {
         reject(err);
       } finally {
-        if (conn) { // conn assignment worked, need to close
+        if (conn) {
           try {
             await conn.close();
           } catch (err) {
