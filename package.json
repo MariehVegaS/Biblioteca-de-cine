@@ -1,0 +1,35 @@
+{
+  "name": "bibliotecadecine",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MariehVegaS/BibliotecaDeCine.git"
+  },
+  "author": "MariehVega_GicellMejia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MariehVegaS/BibliotecaDeCine/issues"
+  },
+  "homepage": "https://github.com/MariehVegaS/BibliotecaDeCine#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.1",
+    "oracledb": "^4.0.1"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      "node_modules/**/node_modules"
+    ],
+    "delay": "2500",
+    "env": {
+      "NODE_ENV": "development",
+      "PORT": 3000
+    }
+  }
+}
