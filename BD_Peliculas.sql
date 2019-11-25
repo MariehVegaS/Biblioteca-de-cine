@@ -19,9 +19,10 @@ Nombre varchar2(35),
 Edad number(3,0),
 CONSTRAINT director_pk PRIMARY KEY (ID_Director));
 
-insert into Director values ('00001', 'Neil Burger', 56);
+insert into Director values ('00001', 'Director no especificado', 00);
 insert into Director values ('00002', 'Gary Ross',63);
-insert into Director values ('00003', '	James Cameron',65);
+insert into Director values ('00003', 'James Cameron',65);
+insert into Director values ('00004', 'Neil Burger', 56);
 
 create table Actores(
 ID_Actor varchar2(5),
