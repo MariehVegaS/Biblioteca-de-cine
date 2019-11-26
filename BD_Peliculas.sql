@@ -950,9 +950,6 @@ BEGIN
 END;
 /
 /*EXPORTAR ARCHIVOS*/
-CALL imgExport('I0020','IMAGEN_EXPORTADA.jpg');
-CALL SONIDO_EXPORT('AU0020','AUDIO_EXPORTADO.mp3');
+CALL imgExport('I0020','IMAGEN_EXPORTADA.png');
+CALL SONIDO_EXPORT('AU0020','AUDIO_EXPORTADO.mpeg');
 CALL doc_export('P0001','afsffas.doc');
-
-SELECT *
-FROM peliculas natural join foto_pelicula natural join imagenes;

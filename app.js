@@ -121,7 +121,6 @@ router.route('/peliculas')
             }
 
             //Validacion para subir un docsito
-
             let guiones = req.body.GUIONES;
             let doc = undefined;
             if (guiones) {
@@ -357,6 +356,129 @@ router.route('/peliculas/imagenes')
             console.log(e);
             res.sendStatus(500);
         }
+    });
+
+router.route('/peliculas/imagenes/:filtro')
+    .put(async (req, res) => {
+
+        const filtro = req.params.filtro;
+        const id = req.body.ID;
+        let procedure, llamada, createProcedure, cambiar;
+        if (id) {
+            try {
+                switch (filtro) {
+                    case "blancoYnegro":
+                        console.log("Es blanco y negro");
+                        procedure = `CREATE OR REPLACE PROCEDURE image_mono(wiCode CHAR)
+                        IS
+                        img ordsys.ordimage;
+                        ctx raw(64) := NULL;
+                        BEGIN
+                          SELECT IMAGE INTO img FROM Imagenes WHERE Id_Fotos = wiCode FOR UPDATE;
+                          img.process('contentFormat=8bitgray quantize = mediancut 2');
+                          UPDATE Imagenes SET IMAGE = img WHERE Id_Fotos = wiCode;
+                        END;`;
+                        llamada = `BEGIN image_mono('${id}'); END;`;
+                        createProcedure = await database.simpleExecute(connectionName, procedure, []);
+                        cambiar = await database.simpleExecute(connectionName, llamada, []);
+                        break;
+                    case "rojo":
+                        console.log("Es rojo");
+                        procedure = `CREATE OR REPLACE PROCEDURE image_red(wiCode CHAR)
+                        IS
+                        img ordsys.ordimage;
+                        ctx raw(64) := NULL;
+                        BEGIN
+                          SELECT IMAGE INTO img FROM Imagenes WHERE Id_Fotos = wiCode FOR UPDATE;
+                          img.process('contrast="100%" "0%" "0%"');
+                          UPDATE Imagenes SET IMAGE = img WHERE Id_Fotos = wiCode;
+                        END;`;
+                        llamada = `BEGIN image_red('${id}'); END;`;
+                        createProcedure = await database.simpleExecute(connectionName, procedure, []);
+                        cambiar = await database.simpleExecute(connectionName, llamada, []);
+                        break;
+                    case "azul":
+                        console.log("Es azul");
+                        procedure = `CREATE OR REPLACE PROCEDURE image_blue(wiCode CHAR)
+                        IS
+                        img ordsys.ordimage;
+                        ctx raw(64) := NULL;
+                        BEGIN
+                          SELECT IMAGE INTO img FROM Imagenes WHERE Id_Fotos = wiCode FOR UPDATE;
+                          img.process('contrast="0%" "0%" "100%"');
+                          UPDATE Imagenes SET IMAGE = img WHERE Id_Fotos = wiCode;
+                        END;`;
+                        llamada = `BEGIN image_blue('${id}'); END;`;
+                        createProcedure = await database.simpleExecute(connectionName, procedure, []);
+                        cambiar = await database.simpleExecute(connectionName, llamada, []);
+                        break;
+                    case "verde":
+                        console.log("Es verde");
+                        procedure = `CREATE OR REPLACE PROCEDURE image_green(wiCode CHAR)
+                        IS
+                        img ordsys.ordimage;
+                        ctx raw(64) := NULL;
+                        BEGIN
+                          SELECT IMAGE INTO img FROM Imagenes WHERE Id_Fotos = wiCode FOR UPDATE;
+                          img.process('contrast="0%" "100%" "0%"');
+                          UPDATE Imagenes SET IMAGE = img WHERE Id_Fotos = wiCode;
+                        END;`;
+                        llamada = `BEGIN image_green('${id}'); END;`;
+                        createProcedure = await database.simpleExecute(connectionName, procedure, []);
+                        cambiar = await database.simpleExecute(connectionName, llamada, []);
+                        break;
+                    case "size":
+                        console.log("Cambiar tamanio");
+                        const width = req.body.WIDTH;
+                        const height = req.body.HEIGHT;
+                        if (width && height) {
+                            procedure = `CREATE OR REPLACE PROCEDURE image_size(wiCode CHAR)
+                        IS
+                        img ordsys.ordimage;
+                        ctx raw(64) := NULL;
+                        BEGIN
+                          SELECT IMAGE INTO img FROM Imagenes WHERE Id_Fotos = wiCode FOR UPDATE;
+                          img.process('maxScale=${width} ${height}');
+                          UPDATE Imagenes SET IMAGE = img WHERE Id_Fotos = wiCode;
+                        END;`;
+                            llamada = `BEGIN image_size('${id}'); END;`;
+                            createProcedure = await database.simpleExecute(connectionName, procedure, []);
+                            cambiar = await database.simpleExecute(connectionName, llamada, []);
+                        } else {
+                            console.log("Faltan las dimensiones");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                res.sendStatus(200);
+            } catch (e) {
+                console.log(e);
+                res.sendStatus(500);
+            }
+        } else {
+            res.json({
+                Alerta: "ID faltante",
+                Información: "Favor colocar un ID en formato JSON para modificar la imagen correspondiente"
+            });
+        }
+        /*
+        const updateSql =
+            `UPDATE ARTISTS SET
+    ARTIST_NAME = :artist_name,
+    GENRE = :genre,
+    BIOGRAFY = :biografy
+    
+    WHERE ARTIST_COD = :artist_cod`;
+
+        const result = await database.simpleExecute(connectionName, updateSql, artist);
+*/
+        //return result.rows;
+        /*const response = {hello: 'This is my API'};*/
+        /*
+        console.log(result);
+        res.json(result);
+        */
     });
 
 router.route('/peliculas/audios')
